@@ -53,7 +53,7 @@ DAMAGE.
 ////////////////////////////////////////////////////
 // initialize the package
 ////////////////////////////////////////////////////
-int Bonjour_Init(
+int DLLEXPORT Bonjour_Init(
    Tcl_Interp *interp
 ) {
    // Initialize the stubs library
@@ -139,6 +139,7 @@ static const char *get_dnsserviceerror_string(DNSServiceErrorType errorCode)
          return "DoubleNAT";
       case kDNSServiceErr_BadTime:
          return "BadTime";
+#if _DNS_SD_H+0 >= 5229002
       case kDNSServiceErr_BadSig:
          return "BadSig";
       case kDNSServiceErr_BadKey:
@@ -155,6 +156,7 @@ static const char *get_dnsserviceerror_string(DNSServiceErrorType errorCode)
          return "NoRouter";
       case kDNSServiceErr_PollingMode:
          return "PollingMode";
+#endif
    } // end switch(errorCode)
 
    return NULL;

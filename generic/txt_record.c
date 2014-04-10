@@ -25,9 +25,9 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 DAMAGE.
 */
 
-#include <dns_sd.h>
 #include <string.h>
 #include <tcl.h>
+#include <dns_sd.h>
 
 #include "bonjour.h"
 #include "txt_record.h"
@@ -37,9 +37,9 @@ DAMAGE.
 // The list will be of the format {key val ?key val? ...}
 ///////////////////////////////////////////////////////////
 void txt2list(
-   uint16_t txtLen,        // TXT record len
-   const void *txtRecord,  // TXT record
-   Tcl_Obj **tclList       // Pointer to uninitialized Tcl object
+   uint16_t txtLen,        /* TXT record len */
+   const void *txtRecord,  /* TXT record */
+   Tcl_Obj **tclList       /* Pointer to uninitialized Tcl object */
 ) {
    Tcl_Obj *result = Tcl_NewListObj(0, NULL);
 
@@ -69,9 +69,9 @@ void txt2list(
 // {key val ?key val?...} into a TXT record.
 ///////////////////////////////////////////////////////////
 void list2txt(
-   Tcl_Obj *tclList,    // Tcl list
-   uint16_t *txtLen,    // length of TXT record
-   void **txtRecord     // TXT record (must be deallocated by caller)
+   Tcl_Obj *tclList,    /* Tcl list */
+   uint16_t *txtLen,    /* length of TXT record */
+   void **txtRecord     /* TXT record (must be deallocated by caller) */
 ) {
 
    int listLen;

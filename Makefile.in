@@ -199,7 +199,7 @@ libraries:
 #========================================================================
 
 doc: doc/bonjour.man
-	tclsh make_doc.tcl nroff < doc/bonjour.man > doc/bonjour.n
+	$(TCLSH) make_doc.tcl nroff < doc/bonjour.man > doc/bonjour.n
 
 install: all install-binaries install-libraries install-doc
 
