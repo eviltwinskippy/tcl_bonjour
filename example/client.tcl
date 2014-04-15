@@ -1,6 +1,6 @@
-# Example client using the bonjour package.
+# Example client using the zeroconf package.
 package require Tcl 8.5
-package require bonjour
+package require zeroconf
 
 # Called when a service is resolved (details are retrieved).
 proc serviceResolved {serviceName hostname port txtRecords} {
@@ -8,7 +8,7 @@ proc serviceResolved {serviceName hostname port txtRecords} {
     puts "   txtRecords: $txtRecords"
 
     # Try resolving an address for the hostname
-    ::bonjour::resolve_address $hostname [list addressResolved $hostname]
+    ::zeroconf::resolve_address $hostname [list addressResolved $hostname]
 }
 
 # Called when a service address is resolved.
@@ -20,16 +20,16 @@ proc addressResolved {name address} {
 proc serviceFound {regType action name domain} {
     puts "$regType on $name.$domain: $action"
     if {$action eq "add"} {
-        ::bonjour::resolve $name $regType $domain serviceResolved
+        ::zeroconf::resolve $name $regType $domain serviceResolved
     }
 }
 
 # Start looking for ssh services.
-::bonjour::browse start _ssh._tcp [list serviceFound _ssh._tcp]
+::zeroconf::browse start _ssh._tcp [list serviceFound _ssh._tcp]
 
 # Start looking for myservice services.
-::bonjour::browse start _myservice._tcp [list serviceFound _myservice._tcp]
-::bonjour::browse start _myotherservice._tcp [list serviceFound _myotherservice._tcp]
+::zeroconf::browse start _myservice._tcp [list serviceFound _myservice._tcp]
+::zeroconf::browse start _myotherservice._tcp [list serviceFound _myotherservice._tcp]
 
 # Enter the event loop.
 vwait forever

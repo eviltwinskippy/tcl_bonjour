@@ -21,7 +21,7 @@ dnl	to configure the system for the local environment.
 # this case) so that we create the export library with the dll.
 #-----------------------------------------------------------------------
 
-AC_INIT([bonjour], [1.1])
+AC_INIT([zeroconf], [1.1])
 
 #--------------------------------------------------------------------
 # Call TEA_INIT as the first TEA_ macro to set up initial vars.
@@ -73,7 +73,18 @@ TEA_SETUP_COMPILER
 # and PKG_TCL_SOURCES.
 #-----------------------------------------------------------------------
 
-TEA_ADD_SOURCES([bonjour.c browse.c register.c resolve.c txt_record.c])
+if test "`uname -s`" = "Darwin"; then
+  ###
+  # On Macosx, Use Bonjour
+  ###
+  TEA_ADD_SOURCES([bonjour/bonjour.c bonjour/browse.c bonjour/register.c bonjour/resolve.c bonjour/txt_record.c])
+else
+  ###
+  # On other platforms, use avahi
+  ###
+  TEA_ADD_SOURCES([avahi/avahi.c avahi/browse.c avahi/register.c avahi/resolve.c avahi/txt_record.c])
+fi
+
 TEA_ADD_HEADERS([])
 TEA_ADD_INCLUDES([])
 TEA_ADD_LIBS([])

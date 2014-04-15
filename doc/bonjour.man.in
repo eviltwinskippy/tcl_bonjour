@@ -1,27 +1,29 @@
 [manpage_begin @PACKAGE_NAME@ n @PACKAGE_VERSION@]
-[copyright {2010 Blair Kitchen <blair@the-blair.com>}]
+[copyright {2014 Sean Woods <yoda@etoyoc.com>}]
 [moddesc {Networking}]
-[moddesc {Bonjour Library}]
+[moddesc {DNSSD Library}]
 [require Tcl 8.5]
 [require @PACKAGE_NAME@ [opt @PACKAGE_VERSION@]]
 [description]
 
 [para]
-This package provides script level access to the Bonjour library.
-Bonjour allows registration of network services so that they
+This package provides script level access to the DNSSD library.
+DNSSD allows registration of network services so that they
 can easily be located by name and/or browsed for by service type.
+On Apple platforms, this interaction is done via bonjour. On linux
+environments, this interaction is done via avahi.
 
 [para]
-The bonjour package currently supports browsing for services
+The DNSSD package currently supports browsing for services
 and service name resolution.  Support for service registration is
 planned in an upcoming version.
 
 [para]
-The bonjour package provides the following commands:
+The dsnsd package provides the following commands:
 
 [list_begin definitions]
 
-[call [cmd {::bonjour::browse start}] [arg regtype] [arg callback]]
+[call [cmd {::dnssd::browse start}] [arg regtype] [arg callback]]
 This procedure begins a browse operation for a given service type.
 Evey time a service is added or removed to the list of running services,
 [arg callback] will be executed.
@@ -33,14 +35,14 @@ removed from the list of running services.  Three arguments will
 be appended to the command: the action (either "add" or "remove"),
 the service name, and the domain.
 
-[call [cmd {::bonjour::browse stop}] [arg regtype]]
+[call [cmd {::dnssd::browse stop}] [arg regtype]]
 This procedure stops a browse operation.  The callback registered
 for [arg regtype] will no longer be called and no new services will
 be added.
 [nl]
 [arg regtype] - The service type (i.e., _http._tcp)
 
-[call [cmd ::bonjour::resolve] [arg name] [arg regtype] [arg domain] [arg script]]
+[call [cmd ::dnssd::resolve] [arg name] [arg regtype] [arg domain] [arg script]]
 This procedure resolves the given service name into a hostname and port.
 [nl]
 [arg name] - The name of the service to resolve
@@ -56,7 +58,7 @@ service name, the hostname, the port, and a list of txt records for
 the service.  The list of records will be of the form {key value 
 ?key value? ...}.
 
-[call [cmd ::bonjour::resolve_address] [arg name]]
+[call [cmd ::dnssd::resolve_address] [arg name]]
 This procedure resolves the given service name into an IP address.
 [nl]
 [arg name] The name of the service to resolve
@@ -64,8 +66,8 @@ This procedure resolves the given service name into an IP address.
 [arg script] - The script to execute when the resolution has completed.
 The IP address of the service will be appended to the callback.
 
-[call [cmd ::bonjour::register] [arg ?options?] [arg regtype] [arg port] [arg ?txt-record?]]
-This procedure registers a new service using Bonjour.
+[call [cmd ::dnssd::register] [arg ?options?] [arg regtype] [arg port] [arg ?txt-record?]]
+This procedure registers a new service using DNS-SD.
 [nl]
 [arg options] - Either -name, followed by the desired service name, or -- to explicitly
 indicate the end of options.
