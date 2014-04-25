@@ -12,7 +12,7 @@
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# RCS: @(#) $Id: Makefile.in,v 1.69 2010/08/17 00:38:28 hobbs Exp $
+# RCS: @(#) $Id: Makefile.in,v 1.59 2005/07/26 19:17:02 mdejong Exp $
 
 #========================================================================
 # Add additional lines to handle any additional AC_SUBST cases that
@@ -73,10 +73,9 @@ exec_prefix	= @exec_prefix@
 
 bindir		= @bindir@
 libdir		= @libdir@
-includedir	= @includedir@
-datarootdir     = @datarootdir@
 datadir		= @datadir@
 mandir		= @mandir@
+includedir	= @includedir@
 
 DESTDIR		=
 
@@ -89,7 +88,6 @@ top_builddir	= .
 
 INSTALL		= @INSTALL@
 INSTALL_PROGRAM	= @INSTALL_PROGRAM@
-INSTALL_LIBRARY	= @INSTALL_PROGRAM@
 INSTALL_DATA	= @INSTALL_DATA@
 INSTALL_SCRIPT	= @INSTALL_SCRIPT@
 
@@ -98,6 +96,7 @@ PACKAGE_VERSION	= @PACKAGE_VERSION@
 CC		= @CC@
 CFLAGS_DEFAULT	= @CFLAGS_DEFAULT@
 CFLAGS_WARNING	= @CFLAGS_WARNING@
+CLEANFILES	= @CLEANFILES@
 EXEEXT		= @EXEEXT@
 LDFLAGS_DEFAULT	= @LDFLAGS_DEFAULT@
 MAKE_LIB	= @MAKE_LIB@
@@ -117,6 +116,8 @@ TCL_SRC_DIR	= @TCL_SRC_DIR@
 #TK_BIN_DIR	= @TK_BIN_DIR@
 #TK_SRC_DIR	= @TK_SRC_DIR@
 
+# This is no longer necessary even for packages that use private Tcl headers
+#TCL_TOP_DIR_NATIVE	= @TCL_TOP_DIR_NATIVE@
 # Not used, but retained for reference of what libs Tcl required
 #TCL_LIBS	= @TCL_LIBS@
 
@@ -130,21 +131,22 @@ TCL_SRC_DIR	= @TCL_SRC_DIR@
 EXTRA_PATH	= $(top_builddir):$(TCL_BIN_DIR)
 #EXTRA_PATH	= $(top_builddir):$(TCL_BIN_DIR):$(TK_BIN_DIR)
 TCLLIBPATH	= $(top_builddir)
-TCLSH_ENV	= TCL_LIBRARY=`@CYGPATH@ $(TCL_SRC_DIR)/library`
-PKG_ENV		= @LD_LIBRARY_PATH_VAR@="$(EXTRA_PATH):$(@LD_LIBRARY_PATH_VAR@)" \
+TCLSH_ENV	= TCL_LIBRARY=`@CYGPATH@ $(TCL_SRC_DIR)/library` \
+		  @LD_LIBRARY_PATH_VAR@="$(EXTRA_PATH):$(@LD_LIBRARY_PATH_VAR@)" \
 		  PATH="$(EXTRA_PATH):$(PATH)" \
 		  TCLLIBPATH="$(TCLLIBPATH)"
+#		  TK_LIBRARY=`@CYGPATH@ $(TK_SRC_DIR)/library`
 
 TCLSH_PROG	= @TCLSH_PROG@
-TCLSH   	= $(PKG_ENV) $(TCLSH_ENV) $(TCLSH_PROG)
+TCLSH	= $(TCLSH_ENV) $(TCLSH_PROG)
 
-#WISH_ENV	= TK_LIBRARY=`@CYGPATH@ $(TK_SRC_DIR)/library`
 #WISH_PROG	= @WISH_PROG@
-#WISH   	= $(PKG_ENV) $(TCLSH_ENV) $(WISH_ENV) $(WISH_PROG)
+#WISH	= $(TCLSH_ENV) $(WISH_PROG)
+
 
 SHARED_BUILD	= @SHARED_BUILD@
 
-INCLUDES	= @PKG_INCLUDES@ @TCL_INCLUDES@
+INCLUDES	= @PKG_INCLUDES@ @TCL_INCLUDES@ -I$(srcdir)/..
 #INCLUDES	= @PKG_INCLUDES@ @TCL_INCLUDES@ @TK_INCLUDES@ @TK_XINCLUDES@
 
 PKG_CFLAGS	= @PKG_CFLAGS@
@@ -157,9 +159,7 @@ PKG_CFLAGS	= @PKG_CFLAGS@
 #DEFS		= $(TCL_DEFS) @DEFS@ $(PKG_CFLAGS)
 DEFS		= @DEFS@ $(PKG_CFLAGS)
 
-# Move pkgIndex.tcl to 'BINARIES' var if it is generated in the Makefile
 CONFIG_CLEAN_FILES = Makefile pkgIndex.tcl
-CLEANFILES	= @CLEANFILES@
 
 CPPFLAGS	= @CPPFLAGS@
 LIBS		= @PKG_LIBS@ @LIBS@
@@ -192,14 +192,18 @@ binaries: $(BINARIES)
 
 libraries:
 
+
 #========================================================================
 # Your doc target should differentiate from doc builds (by the developer)
 # and doc installs (see install-doc), which just install the docs on the
 # end user machine when building from source.
 #========================================================================
 
-doc: doc/bonjour.man
-	$(TCLSH) make_doc.tcl nroff < doc/bonjour.man > doc/bonjour.n
+doc:
+	@echo "If you have documentation to create, place the commands to"
+	@echo "build the docs in the 'doc:' target.  For example:"
+	@echo "        xml2nroff sample.xml > sample.n"
+	@echo "        xml2html sample.xml > sample.html"
 
 install: all install-binaries install-libraries install-doc
 
@@ -228,11 +232,12 @@ install-doc: doc
 	@echo "Installing documentation in $(DESTDIR)$(mandir)"
 	@list='$(srcdir)/doc/*.n'; for i in $$list; do \
 	    echo "Installing $$i"; \
+	    rm -f $(DESTDIR)$(mandir)/mann/`basename $$i`; \
 	    $(INSTALL_DATA) $$i $(DESTDIR)$(mandir)/mann ; \
 	done
 
 test: binaries libraries
-	$(TCLSH) `@CYGPATH@ $(srcdir)/tests/all.tcl` $(TESTFLAGS)
+	@echo "SQLite TEA distribution does not include tests"
 
 shell: binaries libraries
 	@$(TCLSH) $(SCRIPT)
@@ -297,7 +302,7 @@ dist-clean:
 
 dist: dist-clean
 	mkdir -p $(DIST_DIR)
-	cp -p $(srcdir)/ChangeLog $(srcdir)/README* $(srcdir)/license* \
+	cp -p $(srcdir)/README* $(srcdir)/license* \
 		$(srcdir)/aclocal.m4 $(srcdir)/configure $(srcdir)/*.in \
 		$(DIST_DIR)/
 	chmod 664 $(DIST_DIR)/Makefile.in $(DIST_DIR)/aclocal.m4
@@ -359,8 +364,8 @@ install-lib-binaries: binaries
 	@mkdir -p $(DESTDIR)$(pkglibdir)
 	@list='$(lib_BINARIES)'; for p in $$list; do \
 	  if test -f $$p; then \
-	    echo " $(INSTALL_LIBRARY) $$p $(DESTDIR)$(pkglibdir)/$$p"; \
-	    $(INSTALL_LIBRARY) $$p $(DESTDIR)$(pkglibdir)/$$p; \
+	    echo " $(INSTALL_PROGRAM) $$p $(DESTDIR)$(pkglibdir)/$$p"; \
+	    $(INSTALL_PROGRAM) $$p $(DESTDIR)$(pkglibdir)/$$p; \
 	    stub=`echo $$p|sed -e "s/.*\(stub\).*/\1/"`; \
 	    if test "x$$stub" = "xstub"; then \
 		echo " $(RANLIB_STUB) $(DESTDIR)$(pkglibdir)/$$p"; \

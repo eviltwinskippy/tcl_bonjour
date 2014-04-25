@@ -77,12 +77,12 @@ if test "`uname -s`" = "Darwin"; then
   ###
   # On Macosx, Use Bonjour
   ###
-  TEA_ADD_SOURCES([bonjour/bonjour.c bonjour/browse.c bonjour/register.c bonjour/resolve.c bonjour/txt_record.c])
+  TEA_ADD_SOURCES([bonjour.c browse.c register.c resolve.c txt_record.c])
 else
   ###
   # On other platforms, use avahi
   ###
-  TEA_ADD_SOURCES([avahi/avahi.c avahi/browse.c avahi/register.c avahi/resolve.c avahi/txt_record.c])
+  TEA_ADD_SOURCES([generic/avahi.c generic/browse.c generic/register.c generic/resolve.c generic/txt_record.c])
 fi
 
 TEA_ADD_HEADERS([])
